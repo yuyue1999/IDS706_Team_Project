@@ -1,61 +1,62 @@
 import os
-import sqlite3
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import logging
-
-DATABASE = 'items.db'
+import redis
 
 app = Flask(__name__)
 
 # 设置logging到stdout
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
-def get_db_connection():
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    return conn
+# 初始化Redis连接
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
 def init_db():
-    conn = get_db_connection()
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS items (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            description TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
+    # 如果 item_id_counter 不存在，则初始化为0
+    if not r.exists('item_id_counter'):
+        r.set('item_id_counter', 0)
+    # 初始化一个储存所有item id的set
+    if not r.exists('items'):
+        # 虽然SADD时key不存在会自动创建，无此判断也可以，但这里显示初始化以示意
+        pass
 
 @app.route('/')
 def index():
-    # 展示主页面
-    conn = get_db_connection()
-    items = conn.execute("SELECT * FROM items").fetchall()
-    conn.close()
+    # 从items集合中获取所有id，然后获取对应的item信息
+    item_ids = r.smembers('items')
+    items = []
+    for item_id in item_ids:
+        item_data = r.hgetall(f'item:{item_id}')
+        if item_data:
+            # 把id放入字典中以便前端显示
+            item_data['id'] = item_id
+            items.append(item_data)
     return render_template('index.html', items=items)
 
-# API接口
+# API接口 - 获取所有items的JSON
 @app.route('/items', methods=['GET'])
 def get_items():
-    # 返回JSON的API（可选保留）
-    conn = get_db_connection()
-    items = conn.execute('SELECT * FROM items').fetchall()
-    conn.close()
-    items_list = [dict(item) for item in items]
+    item_ids = r.smembers('items')
+    items_list = []
+    for item_id in item_ids:
+        item_data = r.hgetall(f'item:{item_id}')
+        if item_data:
+            item_data['id'] = item_id
+            items_list.append(item_data)
     return jsonify(items_list), 200
 
 @app.route('/items/<int:item_id>', methods=['GET'])
 def get_item(item_id):
-    conn = get_db_connection()
-    item = conn.execute('SELECT * FROM items WHERE id = ?', (item_id,)).fetchone()
-    conn.close()
-    if item is None:
+    item_data = r.hgetall(f'item:{item_id}')
+    if not item_data:
         logging.warning(f'Item with id {item_id} not found')
         return jsonify({'error': 'Item not found'}), 404
-    return jsonify(dict(item)), 200
+    item_data['id'] = item_id
+    return jsonify(item_data), 200
 
-# Create item (从表单提交)
+# Create item
 @app.route('/items', methods=['POST'])
 def create_item():
     name = request.form.get('name')
@@ -63,19 +64,37 @@ def create_item():
 
     if not name:
         logging.error('Name field is required for item creation.')
-        return redirect(url_for('index'))  # 如果失败，也可以返回主页或错误页面
+        return redirect(url_for('index'))
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('INSERT INTO items (name, description) VALUES (?, ?)', (name, description))
-    conn.commit()
-    new_id = cur.lastrowid
-    conn.close()
+    # 递增item_id_counter来生成新ID
+    new_id = r.incr('item_id_counter')
+    # 创建Hash
+    r.hset(f'item:{new_id}', mapping={'name': name, 'description': description})
+    # 将新ID添加到items集合
+    r.sadd('items', new_id)
+
     logging.info(f'Item created with id {new_id}')
-    # 创建成功后返回首页，而非返回JSON
     return redirect(url_for('index'))
+@app.route('/testitems', methods=['POST'])
+def create_item_test():
+    name = request.form.get('name')
+    description = request.form.get('description', '')
 
-# Update item (从表单提交)
+    if not name:
+        logging.error('Name field is required for item creation.')
+        return redirect(url_for('index'))
+
+    # 递增item_id_counter来生成新ID
+    new_id = r.incr('item_id_counter')
+    # 创建Hash
+    r.hset(f'item:{new_id}', mapping={'name': name, 'description': description})
+    # 将新ID添加到items集合
+    r.sadd('items', new_id)
+
+    logging.info(f'Item created with id {new_id}')
+    return jsonify({'status': 'success', 'id': new_id, 'name': name, 'description': description}), 200
+
+# Update item
 @app.route('/items/<int:item_id>/update', methods=['POST'])
 def update_item(item_id):
     name = request.form.get('name')
@@ -85,33 +104,27 @@ def update_item(item_id):
         logging.error('Name field is required for item update.')
         return redirect(url_for('index'))
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('UPDATE items SET name = ?, description = ? WHERE id = ?', (name, description, item_id))
-    conn.commit()
-    affected = cur.rowcount
-    conn.close()
-
-    if affected == 0:
+    # 检查item是否存在
+    if not r.exists(f'item:{item_id}'):
         logging.warning(f'No item with id {item_id} found to update.')
         return redirect(url_for('index'))
 
+    r.hset(f'item:{item_id}', mapping={'name': name, 'description': description})
     logging.info(f'Item with id {item_id} updated.')
     return redirect(url_for('index'))
 
-# Delete item (从表单提交)
+# Delete item
 @app.route('/items/<int:item_id>/delete', methods=['POST'])
 def delete_item(item_id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('DELETE FROM items WHERE id = ?', (item_id,))
-    conn.commit()
-    affected = cur.rowcount
-    conn.close()
-
-    if affected == 0:
+    # 检查是否存在
+    if not r.exists(f'item:{item_id}'):
         logging.warning(f'No item with id {item_id} found to delete.')
         return redirect(url_for('index'))
+
+    # 删除hash
+    r.delete(f'item:{item_id}')
+    # 从集合中删除该id
+    r.srem('items', item_id)
 
     logging.info(f'Item with id {item_id} deleted.')
     return redirect(url_for('index'))
