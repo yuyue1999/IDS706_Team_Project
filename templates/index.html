@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Items</title>
+<style>
+  .edit-form {
+    display: none;
+    margin: 10px 0;
+  }
+  table {
+    border-collapse: collapse;
+  }
+  table, th, td {
+    border:1px solid #000;
+  }
+  th, td {
+    padding:5px;
+  }
+</style>
+</head>
+<body>
+<h1>Items</h1>
+
+<!-- 新增表单 -->
+<h2>Add Item</h2>
+<form action="/items" method="post">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <label for="description">Description:</label>
+    <input type="text" id="description" name="description">
+    <button type="submit">Add Item</button>
+</form>
+
+<h2>Item List</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Actions</th>
+    </tr>
+    {% for item in items %}
+    <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.description }}</td>
+        <td>
+            <!-- Edit按钮点击后显示编辑表单 -->
+            <button type="button" onclick="toggleEditForm('{{ item.id }}')">Edit</button>
+            <!-- Delete提交表单删除 -->
+            <form action="/items/{{ item.id }}/delete" method="post" style="display:inline;"
+                  onsubmit="return confirm('Are you sure you want to delete this item?');">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    <!-- 编辑表单，初始隐藏 -->
+    <tr class="edit-form" id="edit-form-{{ item.id }}">
+        <td colspan="4">
+            <form action="/items/{{ item.id }}/update" method="post">
+                <label>Name:</label>
+                <input type="text" name="name" value="{{ item.name }}" required>
+                <label>Description:</label>
+                <input type="text" name="description" value="{{ item.description }}">
+                <button type="submit">Update</button>
+                <button type="button" onclick="toggleEditForm('{{ item.id }}')">Cancel</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<script>
+function toggleEditForm(itemId) {
+    var formRow = document.getElementById('edit-form-' + itemId);
+    if(formRow.style.display === 'none' || formRow.style.display === '') {
+        formRow.style.display = 'table-row';
+    } else {
+        formRow.style.display = 'none';
+    }
+}
+</script>
+
+</body>
+</html>
