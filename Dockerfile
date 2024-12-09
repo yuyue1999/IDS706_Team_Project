@@ -15,9 +15,7 @@ COPY . .
 
 # Expose port 5000 for Flask
 EXPOSE 8080
-
-# Set the environment variable for Flask
-ENV GROQ_API_KEY=${GROQ_API_KEY}
+EXPOSE 14124
 
 # Run the application
 CMD ["python", "app.py"]
