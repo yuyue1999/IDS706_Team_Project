@@ -9,7 +9,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: 381492212823.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/ids706_group_project
+  ECR_REPOSITORY: 381492212823.dkr.ecr.us-east-1.amazonaws.com/ids706_group_project
   DOCKER_IMAGE: management:latest
 
 jobs:
