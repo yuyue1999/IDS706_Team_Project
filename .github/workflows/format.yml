@@ -1,4 +1,4 @@
-name: CI
+name: format
 on:
   push:
     branches: [ "main" ]
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: install packages
-        run: make install
-      - name: lint
-        run: make lint
+      - name: format
+        run: |
+          make install
+          make format
