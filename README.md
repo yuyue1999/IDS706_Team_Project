@@ -58,8 +58,7 @@ Below is a high-level architectural diagram of the system:
                              v
                     +--------+---------+
                     |      Redis       |
-                    |  (AWS ElastiCache|
-                    |   for Redis)     |
+                    |   (Redis Cloud)  |
                     +--------+---------+
                              |
                              |  Data Pipeline Integration
@@ -286,22 +285,22 @@ Our team utilized principles from the teamwork reference materials to foster col
 1. **yy373:**
    - Positive: Strong technical execution, especially in creating a secure and efficient microservice.
    - Improvement: Enhance communication during infrastructure discussions.
-   - Grade: 8.5/10.
+   - Grade: 10/10.
 
 2. **hx84:**
    - Positive: Delivered robust AWS infrastructure and streamlined the CI/CD pipeline effectively.
    - Improvement: Provide more input on microservice design.
-   - Grade: 8.5/10.
+   - Grade: 10/10.
 
 3. **ys386:**
    - Positive: Delivered detailed performance insights and ensured load testing reliability.
    - Improvement: Plan workload better to avoid last-minute rushes.
-   - Grade: 8/10.
+   - Grade: 10/10.
 
 4. **th331:**
    - Positive: Created a clear architectural diagram and delivered Pandas integration seamlessly.
    - Improvement: More proactive in collaborative tasks like CI/CD pipeline setup.
-   - Grade: 8/10.
+   - Grade: 10/10.
 
 ---
 
