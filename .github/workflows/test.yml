@@ -1,9 +1,6 @@
 name: test
 on:
-  workflow_run:
-    workflows: ["CI/CD"]
-    types:
-      - completed
+  workflow_dispatch:
 
 jobs:
   build:
