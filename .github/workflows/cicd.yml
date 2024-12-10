@@ -1,0 +1,61 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: 381492212823.dkr.ecr.us-east-1.amazonaws.com/ids706_group_project
+  DOCKER_IMAGE: management:latest
+
+jobs:
+  ci:
+    name: CI - Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Set environment variables from secrets
+        run: |
+          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> $GITHUB_ENV
+          echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> $GITHUB_ENV
+          echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> $GITHUB_ENV
+          
+      - name: Install dependencies
+        run: |
+          make install
+
+      - name: Run Tests
+        run: |
+          make test
+
+  cd:
+    name: CD - Deploy Flask App
+    runs-on: ubuntu-latest
+    needs: ci
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Build Docker Image
+        run: |
+          make build
+
+      - name: Push and Auto Deploy Docker Image
+        run: |
+          make push
