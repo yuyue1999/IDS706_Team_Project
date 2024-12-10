@@ -273,32 +273,32 @@ Our team utilized principles from the teamwork reference materials to foster col
 #### Contributions, Strengths, and Areas of Improvement
 
 | **Team Member** | **Contributions**                                                                                               | **Strengths**                                              | **Areas for Improvement**                                |
-|------------------|----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|---------------------------------------------------------|
-| **Yy**        | Developed the microservice and Dockerized the application using a Distroless image. Implemented logging.        | Strong coding skills, attention to security and efficiency. | Could improve on documentation clarity.                 |
-| **Hj**          | Set up AWS infrastructure using AWS CDK, handled Redis migration, and managed CI/CD pipeline.                  | Expertise in cloud infrastructure, quick troubleshooting. | Should engage more in cross-functional discussions.     |
-| **Ys**      | Conducted performance testing, implemented `load_test.py`, and produced data analysis reports.                 | Analytical mindset, excellent debugging skills.           | Needs to manage time more effectively under deadlines.  |
-| **th**         | Designed the architectural diagram and worked on Pandas integration for data engineering tasks.                | Strong visualization and data processing skills.          | Could contribute more actively to performance testing. |
+|-----------------|----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|---------------------------------------------------------|
+| **yy373**       | Developed the microservice and Dockerized the application using a Distroless image. Implemented logging.        | Strong coding skills, attention to security and efficiency. | Could improve on documentation clarity.                 |
+| **hx84**        | Set up AWS infrastructure using AWS CDK, handled Redis migration, and managed CI/CD pipeline.                  | Expertise in cloud infrastructure, quick troubleshooting. | Should engage more in cross-functional discussions.     |
+| **ys386**          | Conducted performance testing, implemented `load_test.py`, and produced data analysis reports.                 | Analytical mindset, excellent debugging skills.           | Needs to manage time more effectively under deadlines.  |
+| **th331**          | Designed the architectural diagram and worked on Pandas integration for data engineering tasks.                | Strong visualization and data processing skills.          | Could contribute more actively to performance testing. |
 
 ---
 
 #### Peer Evaluations and Feedback Session Outcomes
 
-1. **yy:**
+1. **yy373:**
    - Positive: Strong technical execution, especially in creating a secure and efficient microservice.
    - Improvement: Enhance communication during infrastructure discussions.
-   - Grade: 9/10.
+   - Grade: 8.5/10.
 
-2. **hj:**
+2. **hx84:**
    - Positive: Delivered robust AWS infrastructure and streamlined the CI/CD pipeline effectively.
    - Improvement: Provide more input on microservice design.
    - Grade: 8.5/10.
 
-3. **ys:**
+3. **ys386:**
    - Positive: Delivered detailed performance insights and ensured load testing reliability.
    - Improvement: Plan workload better to avoid last-minute rushes.
    - Grade: 8/10.
 
-4. **th:**
+4. **th331:**
    - Positive: Created a clear architectural diagram and delivered Pandas integration seamlessly.
    - Improvement: More proactive in collaborative tasks like CI/CD pipeline setup.
    - Grade: 8/10.
