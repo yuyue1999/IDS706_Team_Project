@@ -28,10 +28,12 @@ lint:
 	ruff check . --fix --verbose
 
 format:	
+	. $(VENV_DIR)/bin/activate && \
 	black . --line-length 100 --verbose --exclude 'IDS706'
 
 test:
-	. $(VENV_DIR)/bin/activate && python load_test.py
+	. $(VENV_DIR)/bin/activate && \
+	python load_test.py
 
 run:
 	make build
