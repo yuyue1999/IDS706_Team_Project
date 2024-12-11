@@ -7,6 +7,10 @@
 
 # IDS706 Team Project
 
+## Links
+- video: https://youtu.be/sj_G4-WpaMI
+- AWS: https://8ck4buzifx.us-east-1.awsapprunner.com/
+
 ## Table of Contents
 - [Overview](#overview)
 - [Architecture](#architecture)
